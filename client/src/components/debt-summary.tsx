@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
 import { CheckCircle2, Wallet } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface DebtSummaryProps {
   debts: Debt[];
@@ -11,6 +12,8 @@ interface DebtSummaryProps {
 }
 
 export function DebtSummary({ debts, currentUserId }: DebtSummaryProps) {
+  const { t } = useTranslation();
+
   const settleDebtMutation = useMutation({
     mutationFn: async (debtId: number) => {
       await apiRequest("POST", `/api/debts/${debtId}/settle`);
@@ -34,13 +37,13 @@ export function DebtSummary({ debts, currentUserId }: DebtSummaryProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Wallet className="h-5 w-5" />
-          Debt Summary
+          {t('debts.summary')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {youOwe.length > 0 && (
           <div>
-            <h3 className="font-semibold text-destructive mb-2">You Owe</h3>
+            <h3 className="font-semibold text-destructive mb-2">{t('debts.youOwe')}</h3>
             <div className="space-y-3">
               {youOwe.map((debt) => (
                 <div
@@ -49,7 +52,9 @@ export function DebtSummary({ debts, currentUserId }: DebtSummaryProps) {
                 >
                   <div>
                     <div className="font-medium">${Number(debt.amount).toFixed(2)}</div>
-                    <div className="text-sm text-muted-foreground">to User {debt.toUser}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {t('debts.to', { user: debt.toUser })}
+                    </div>
                   </div>
                   <Button
                     variant="outline"
@@ -57,7 +62,7 @@ export function DebtSummary({ debts, currentUserId }: DebtSummaryProps) {
                     onClick={() => settleDebtMutation.mutate(debt.id)}
                     disabled={settleDebtMutation.isPending}
                   >
-                    Mark as Paid
+                    {t('debts.markAsPaid')}
                   </Button>
                 </div>
               ))}
@@ -67,7 +72,7 @@ export function DebtSummary({ debts, currentUserId }: DebtSummaryProps) {
 
         {owedToYou.length > 0 && (
           <div>
-            <h3 className="font-semibold text-primary mb-2">Owed to You</h3>
+            <h3 className="font-semibold text-primary mb-2">{t('debts.owedToYou')}</h3>
             <div className="space-y-3">
               {owedToYou.map((debt) => (
                 <div
@@ -76,7 +81,9 @@ export function DebtSummary({ debts, currentUserId }: DebtSummaryProps) {
                 >
                   <div>
                     <div className="font-medium">${Number(debt.amount).toFixed(2)}</div>
-                    <div className="text-sm text-muted-foreground">from User {debt.fromUser}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {t('debts.from', { user: debt.fromUser })}
+                    </div>
                   </div>
                   <Button
                     variant="outline"
@@ -84,7 +91,7 @@ export function DebtSummary({ debts, currentUserId }: DebtSummaryProps) {
                     onClick={() => settleDebtMutation.mutate(debt.id)}
                     disabled={settleDebtMutation.isPending}
                   >
-                    Mark as Received
+                    {t('debts.markAsReceived')}
                   </Button>
                 </div>
               ))}
@@ -94,7 +101,7 @@ export function DebtSummary({ debts, currentUserId }: DebtSummaryProps) {
 
         {settledDebts.length > 0 && (
           <div>
-            <h3 className="font-semibold text-muted-foreground mb-2">Settled</h3>
+            <h3 className="font-semibold text-muted-foreground mb-2">{t('debts.settled')}</h3>
             <div className="space-y-3">
               {settledDebts.map((debt) => (
                 <div
@@ -105,8 +112,8 @@ export function DebtSummary({ debts, currentUserId }: DebtSummaryProps) {
                     <div className="font-medium">${Number(debt.amount).toFixed(2)}</div>
                     <div className="text-sm text-muted-foreground">
                       {debt.fromUser === currentUserId
-                        ? `Paid to User ${debt.toUser}`
-                        : `Received from User ${debt.fromUser}`}
+                        ? t('debts.to', { user: debt.toUser })
+                        : t('debts.from', { user: debt.fromUser })}
                     </div>
                   </div>
                   <CheckCircle2 className="h-5 w-5 text-muted-foreground" />
@@ -118,7 +125,7 @@ export function DebtSummary({ debts, currentUserId }: DebtSummaryProps) {
 
         {debts.length === 0 && (
           <div className="text-center text-muted-foreground py-8">
-            No debts to display. Add some items and calculate expenses!
+            {t('debts.noDebts')}
           </div>
         )}
       </CardContent>

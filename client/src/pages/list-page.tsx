@@ -14,11 +14,13 @@ import { useAuth } from "@/hooks/use-auth";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Share2, Plus, Calculator } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 export default function ListPage() {
   const [, params] = useRoute("/lists/:id");
   const { toast } = useToast();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const listId = parseInt(params!.id);
 
   const { data: list } = useQuery<List>({
@@ -84,7 +86,7 @@ export default function ListPage() {
           <div>
             <h1 className="text-3xl font-bold">{list?.name}</h1>
             <div className="flex items-center gap-2 mt-2">
-              <p className="text-muted-foreground">Share code:</p>
+              <p className="text-muted-foreground">{t('list.shareCode')}:</p>
               <code className="bg-muted px-2 py-1 rounded">{list?.code}</code>
             </div>
           </div>
@@ -97,11 +99,11 @@ export default function ListPage() {
               });
             }}>
               <Share2 className="h-4 w-4 mr-2" />
-              Share
+              {t('list.share')}
             </Button>
             <Button onClick={() => calculateDebtsMutation.mutate()}>
               <Calculator className="h-4 w-4 mr-2" />
-              Calculate Debts
+              {t('list.calculateDebts')}
             </Button>
           </div>
         </div>
@@ -110,11 +112,10 @@ export default function ListPage() {
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>Shopping List</CardTitle>
+                <CardTitle>{t('list.shoppingList')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={form.handleSubmit((data) => {
-                  console.log("Submitting item:", data);
                   addItemMutation.mutate({
                     name: data.name,
                     price: data.price,
@@ -122,13 +123,13 @@ export default function ListPage() {
                   });
                 })} className="flex gap-4 mb-6">
                   <Input 
-                    placeholder="Item name" 
+                    placeholder={t('list.itemName')}
                     {...form.register("name")}
                   />
                   <Input
                     type="number"
                     step="0.01"
-                    placeholder="Price"
+                    placeholder={t('list.price')}
                     {...form.register("price")}
                   />
                   <Button type="submit" disabled={addItemMutation.isPending}>
@@ -156,7 +157,7 @@ export default function ListPage() {
                           ${Number(item.price || 0).toFixed(2)}
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          Paid by: {item.paidBy === user?.id ? "You" : "Other"}
+                          {t('list.paidBy.you')}: {item.paidBy === user?.id ? t('list.paidBy.you') : t('list.paidBy.other')}
                         </div>
                       </div>
                     </div>
