@@ -2,15 +2,17 @@ import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { List } from "@shared/schema";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, UserPlus } from "lucide-react";
 import { NewListDialog } from "@/components/new-list-dialog";
+import { JoinListDialog } from "@/components/join-list-dialog";
 import { useState } from "react";
 import { ListCard } from "@/components/list-card";
 
 export default function HomePage() {
   const { user } = useAuth();
   const [showNewList, setShowNewList] = useState(false);
-  
+  const [showJoinList, setShowJoinList] = useState(false);
+
   const { data: lists } = useQuery<List[]>({
     queryKey: ["/api/lists"],
   });
@@ -23,10 +25,16 @@ export default function HomePage() {
             <h1 className="text-3xl font-bold">Welcome, {user?.username}!</h1>
             <p className="text-muted-foreground">Manage your shopping lists and expenses</p>
           </div>
-          <Button onClick={() => setShowNewList(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            New List
-          </Button>
+          <div className="flex gap-4">
+            <Button variant="outline" onClick={() => setShowJoinList(true)}>
+              <UserPlus className="h-4 w-4 mr-2" />
+              Join List
+            </Button>
+            <Button onClick={() => setShowNewList(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              New List
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -36,6 +44,7 @@ export default function HomePage() {
         </div>
 
         <NewListDialog open={showNewList} onOpenChange={setShowNewList} />
+        <JoinListDialog open={showJoinList} onOpenChange={setShowJoinList} />
       </div>
     </div>
   );

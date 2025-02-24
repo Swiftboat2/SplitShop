@@ -34,8 +34,9 @@ export default function ListPage() {
   });
 
   const addItemMutation = useMutation({
-    mutationFn: async (item: typeof insertItemSchema._type) => {
-      await apiRequest("POST", `/api/lists/${listId}/items`, item);
+    mutationFn: async (data: typeof insertItemSchema._type) => {
+      const response = await apiRequest("POST", `/api/lists/${listId}/items`, data);
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/lists/${listId}/items`] });
@@ -71,8 +72,8 @@ export default function ListPage() {
     resolver: zodResolver(insertItemSchema),
     defaultValues: {
       name: "",
-      price: undefined,
-      paidBy: undefined,
+      price: "",
+      paidBy: user?.id,
     },
   });
 
@@ -82,7 +83,10 @@ export default function ListPage() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold">{list?.name}</h1>
-            <p className="text-muted-foreground">Share code: {list?.code}</p>
+            <div className="flex items-center gap-2 mt-2">
+              <p className="text-muted-foreground">Share code:</p>
+              <code className="bg-muted px-2 py-1 rounded">{list?.code}</code>
+            </div>
           </div>
           <div className="flex gap-4">
             <Button variant="outline" onClick={() => {
@@ -110,14 +114,22 @@ export default function ListPage() {
               </CardHeader>
               <CardContent>
                 <form onSubmit={form.handleSubmit((data) => {
-                  addItemMutation.mutate({ ...data, paidBy: user?.id });
+                  console.log("Submitting item:", data);
+                  addItemMutation.mutate({
+                    name: data.name,
+                    price: data.price,
+                    paidBy: user?.id
+                  });
                 })} className="flex gap-4 mb-6">
-                  <Input placeholder="Item name" {...form.register("name")} />
+                  <Input 
+                    placeholder="Item name" 
+                    {...form.register("name")}
+                  />
                   <Input
                     type="number"
                     step="0.01"
                     placeholder="Price"
-                    {...form.register("price", { valueAsNumber: true })}
+                    {...form.register("price")}
                   />
                   <Button type="submit" disabled={addItemMutation.isPending}>
                     <Plus className="h-4 w-4" />
@@ -141,7 +153,7 @@ export default function ListPage() {
                       </div>
                       <div className="text-right">
                         <div className="font-medium">
-                          ${Number(item.price).toFixed(2)}
+                          ${Number(item.price || 0).toFixed(2)}
                         </div>
                         <div className="text-sm text-muted-foreground">
                           Paid by: {item.paidBy === user?.id ? "You" : "Other"}
