@@ -1,0 +1,164 @@
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useRoute } from "wouter";
+import { List, Item, Debt } from "@shared/schema";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { insertItemSchema } from "@shared/schema";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { DebtSummary } from "@/components/debt-summary";
+import { useAuth } from "@/hooks/use-auth";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Share2, Plus, Calculator } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+export default function ListPage() {
+  const [, params] = useRoute("/lists/:id");
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const listId = parseInt(params!.id);
+
+  const { data: list } = useQuery<List>({
+    queryKey: [`/api/lists/${listId}`],
+  });
+
+  const { data: items } = useQuery<Item[]>({
+    queryKey: [`/api/lists/${listId}/items`],
+  });
+
+  const { data: debts } = useQuery<Debt[]>({
+    queryKey: [`/api/lists/${listId}/debts`],
+  });
+
+  const addItemMutation = useMutation({
+    mutationFn: async (item: typeof insertItemSchema._type) => {
+      await apiRequest("POST", `/api/lists/${listId}/items`, item);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/lists/${listId}/items`] });
+      form.reset();
+    },
+  });
+
+  const toggleItemMutation = useMutation({
+    mutationFn: async (item: Item) => {
+      await apiRequest("PATCH", `/api/items/${item.id}`, {
+        completed: !item.completed,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/lists/${listId}/items`] });
+    },
+  });
+
+  const calculateDebtsMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("POST", `/api/lists/${listId}/calculate-debts`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/lists/${listId}/debts`] });
+      toast({
+        title: "Debts calculated",
+        description: "The expenses have been split between all members",
+      });
+    },
+  });
+
+  const form = useForm({
+    resolver: zodResolver(insertItemSchema),
+    defaultValues: {
+      name: "",
+      price: undefined,
+      paidBy: undefined,
+    },
+  });
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto p-8">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold">{list?.name}</h1>
+            <p className="text-muted-foreground">Share code: {list?.code}</p>
+          </div>
+          <div className="flex gap-4">
+            <Button variant="outline" onClick={() => {
+              navigator.clipboard.writeText(list?.code || "");
+              toast({
+                title: "Code copied",
+                description: "Share this code with others to invite them",
+              });
+            }}>
+              <Share2 className="h-4 w-4 mr-2" />
+              Share
+            </Button>
+            <Button onClick={() => calculateDebtsMutation.mutate()}>
+              <Calculator className="h-4 w-4 mr-2" />
+              Calculate Debts
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Shopping List</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={form.handleSubmit((data) => {
+                  addItemMutation.mutate({ ...data, paidBy: user?.id });
+                })} className="flex gap-4 mb-6">
+                  <Input placeholder="Item name" {...form.register("name")} />
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder="Price"
+                    {...form.register("price", { valueAsNumber: true })}
+                  />
+                  <Button type="submit" disabled={addItemMutation.isPending}>
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </form>
+
+                <div className="space-y-4">
+                  {items?.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between p-4 rounded-lg border"
+                    >
+                      <div className="flex items-center gap-4">
+                        <Checkbox
+                          checked={item.completed || false}
+                          onCheckedChange={() => toggleItemMutation.mutate(item)}
+                        />
+                        <span className={item.completed ? "line-through" : ""}>
+                          {item.name}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-medium">
+                          ${Number(item.price).toFixed(2)}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Paid by: {item.paidBy === user?.id ? "You" : "Other"}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div>
+            <DebtSummary debts={debts || []} currentUserId={user?.id || 0} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
