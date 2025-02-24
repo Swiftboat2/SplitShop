@@ -8,22 +8,23 @@ const MemoryStore = createMemoryStore(session);
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
+
   createList(list: InsertList & { createdBy: number }): Promise<List>;
   getList(id: number): Promise<List | undefined>;
   getListByCode(code: string): Promise<List | undefined>;
   getListsForUser(userId: number): Promise<List[]>;
   addUserToList(listId: number, userId: number): Promise<void>;
-  
+
   addItem(item: InsertItem & { listId: number }): Promise<Item>;
   updateItem(id: number, updates: Partial<Item>): Promise<Item>;
   getItemsForList(listId: number): Promise<Item[]>;
-  
+
   recordDebt(debt: Omit<Debt, "id">): Promise<Debt>;
   getDebtsForList(listId: number): Promise<Debt[]>;
   settleDebt(id: number): Promise<Debt>;
-  
+
   sessionStore: session.Store;
 }
 
@@ -55,6 +56,12 @@ export class MemStorage implements IStorage {
   async getUserByUsername(username: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(
       (user) => user.username === username,
+    );
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.email === email,
     );
   }
 

@@ -106,6 +106,7 @@ function RegisterForm() {
     resolver: zodResolver(insertUserSchema),
     defaultValues: {
       username: "",
+      email: "",
       password: "",
     },
   });
@@ -115,10 +116,34 @@ function RegisterForm() {
       <div className="space-y-2">
         <Label htmlFor="reg-username">Username</Label>
         <Input id="reg-username" {...form.register("username")} />
+        {form.formState.errors.username && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors.username.message}
+          </p>
+        )}
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="reg-email">Email</Label>
+        <Input 
+          id="reg-email" 
+          type="email" 
+          {...form.register("email")} 
+          placeholder="you@example.com"
+        />
+        {form.formState.errors.email && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors.email.message}
+          </p>
+        )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="reg-password">Password</Label>
         <Input id="reg-password" type="password" {...form.register("password")} />
+        {form.formState.errors.password && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors.password.message}
+          </p>
+        )}
       </div>
       <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
         {registerMutation.isPending ? (

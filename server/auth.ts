@@ -30,7 +30,7 @@ async function comparePasswords(supplied: string, stored: string) {
 
 export function setupAuth(app: Express) {
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET || 'dev_secret_key',  // Added default for development
+    secret: process.env.SESSION_SECRET || 'dev_secret_key',
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
@@ -88,17 +88,22 @@ export function setupAuth(app: Express) {
         return res.status(400).send("Username already exists");
       }
 
+      const existingEmail = await storage.getUserByEmail(req.body.email);
+      if (existingEmail) {
+        return res.status(400).send("Email already registered");
+      }
+
       const hashedPassword = await hashPassword(req.body.password);
       console.log('Registration - storing user with hashed password');
 
       const user = await storage.createUser({
         username: req.body.username,
+        email: req.body.email,
         password: hashedPassword,
       });
 
       req.login(user, (err) => {
         if (err) return next(err);
-        // Don't send password back to client
         const { password, ...userWithoutPassword } = user;
         res.status(201).json(userWithoutPassword);
       });
@@ -115,7 +120,6 @@ export function setupAuth(app: Express) {
 
       req.login(user, (err) => {
         if (err) return next(err);
-        // Don't send password back to client
         const { password, ...userWithoutPassword } = user;
         res.status(200).json(userWithoutPassword);
       });
@@ -131,7 +135,6 @@ export function setupAuth(app: Express) {
 
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    // Don't send password back to client
     const { password, ...userWithoutPassword } = req.user;
     res.json(userWithoutPassword);
   });

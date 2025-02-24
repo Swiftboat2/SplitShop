@@ -5,6 +5,7 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
+  email: text("email").notNull().unique(),
   password: text("password").notNull(),
 });
 
@@ -40,10 +41,15 @@ export const debts = pgTable("debts", {
   settled: boolean("settled").default(false),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});
+export const insertUserSchema = createInsertSchema(users)
+  .extend({
+    email: z.string().email("Please enter a valid email address"),
+  })
+  .pick({
+    username: true,
+    email: true,
+    password: true,
+  });
 
 export const insertListSchema = createInsertSchema(lists).pick({
   name: true,
