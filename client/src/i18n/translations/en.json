@@ -8,6 +8,8 @@
     "password": "Password",
     "tagline": "Split Expenses, Not Friendships",
     "description": "Create shopping lists, track expenses, and easily split costs with friends and roommates.",
+    "orContinueWith": "or continue with",
+    "continueWithGoogle": "Continue with Google",
     "features": {
       "realtime": {
         "title": "Real-time Updates",

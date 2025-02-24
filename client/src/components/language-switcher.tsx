@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
-import { Languages } from "lucide-react";
+import { SiUnitednations } from "react-icons/si";
 
 export function LanguageSwitcher() {
   const { i18n } = useTranslation();
@@ -12,13 +12,13 @@ export function LanguageSwitcher() {
 
   return (
     <Button
-      variant="ghost"
+      variant="outline"
       size="icon"
       onClick={toggleLanguage}
-      className="fixed top-4 right-4"
+      className="fixed top-4 right-4 w-10 h-10"
       title={i18n.language === 'en' ? 'Switch to Spanish' : 'Cambiar a Inglés'}
     >
-      <Languages className="h-5 w-5" />
+      {i18n.language === 'en' ? '🇺🇸' : '🇦🇷'}
     </Button>
   );
 }

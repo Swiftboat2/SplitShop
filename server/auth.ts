@@ -6,12 +6,18 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
+import { initializeApp } from "firebase-admin/app";
 
 declare global {
   namespace Express {
     interface User extends SelectUser {}
   }
 }
+
+// Initialize Firebase Admin with minimal config for development
+initializeApp({
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+});
 
 const scryptAsync = promisify(scrypt);
 
@@ -124,6 +130,36 @@ export function setupAuth(app: Express) {
         res.status(200).json(userWithoutPassword);
       });
     })(req, res, next);
+  });
+
+  app.post("/api/login/google", async (req, res, next) => {
+    try {
+      const { token } = req.body;
+      // Import auth at runtime to avoid the module not found error
+      const { getAuth } = await import('firebase-admin/auth');
+      const decodedToken = await getAuth().verifyIdToken(token);
+      const { email, name } = decodedToken;
+
+      let user = await storage.getUserByEmail(email);
+
+      if (!user) {
+        // Create a new user if they don't exist
+        user = await storage.createUser({
+          username: name || email.split('@')[0],
+          email,
+          password: await hashPassword(Math.random().toString(36)), // Random password for Google users
+        });
+      }
+
+      req.login(user, (err) => {
+        if (err) return next(err);
+        const { password, ...userWithoutPassword } = user;
+        res.json(userWithoutPassword);
+      });
+    } catch (error) {
+      console.error('Google authentication error:', error);
+      res.status(401).send("Invalid Google token");
+    }
   });
 
   app.post("/api/logout", (req, res, next) => {

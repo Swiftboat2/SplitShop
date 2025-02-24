@@ -7,6 +7,8 @@ import {
 import { insertUserSchema, User as SelectUser, InsertUser } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { auth, googleProvider } from "@/lib/firebase";
+import { signInWithPopup } from "firebase/auth";
 
 type AuthContextType = {
   user: SelectUser | null;
@@ -15,6 +17,7 @@ type AuthContextType = {
   loginMutation: UseMutationResult<SelectUser, Error, LoginData>;
   logoutMutation: UseMutationResult<void, Error, void>;
   registerMutation: UseMutationResult<SelectUser, Error, InsertUser>;
+  googleSignInMutation: UseMutationResult<SelectUser, Error, void>;
 };
 
 type LoginData = Pick<InsertUser, "username" | "password">;
@@ -48,6 +51,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   });
 
+  const googleSignInMutation = useMutation({
+    mutationFn: async () => {
+      const result = await signInWithPopup(auth, googleProvider);
+      const response = await apiRequest("POST", "/api/login/google", {
+        token: await result.user.getIdToken(),
+      });
+      return response.json();
+    },
+    onSuccess: (user: SelectUser) => {
+      queryClient.setQueryData(["/api/user"], user);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Google Sign-in failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const registerMutation = useMutation({
     mutationFn: async (credentials: InsertUser) => {
       const res = await apiRequest("POST", "/api/register", credentials);
@@ -67,6 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
+      await auth.signOut();
       await apiRequest("POST", "/api/logout");
     },
     onSuccess: () => {
@@ -90,6 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginMutation,
         logoutMutation,
         registerMutation,
+        googleSignInMutation,
       }}
     >
       {children}

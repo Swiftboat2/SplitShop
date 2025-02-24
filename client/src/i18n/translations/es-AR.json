@@ -8,6 +8,8 @@
     "password": "Contraseña",
     "tagline": "Dividí Gastos, No Amistades",
     "description": "Creá listas de compras, registrá gastos y dividí costos con amigos y compañeros de casa fácilmente.",
+    "orContinueWith": "o continuá con",
+    "continueWithGoogle": "Continuar con Google",
     "features": {
       "realtime": {
         "title": "Actualizaciones en Tiempo Real",
