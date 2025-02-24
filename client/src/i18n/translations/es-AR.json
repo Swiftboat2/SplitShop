@@ -34,6 +34,8 @@
     "shoppingList": "Lista de Compras",
     "itemName": "Nombre del artículo",
     "price": "Precio",
+    "created": "Creada",
+    "viewList": "Ver Lista",
     "paidBy": {
       "you": "Vos",
       "other": "Otro"
@@ -49,5 +51,6 @@
     "markAsPaid": "Marcar como Pagado",
     "markAsReceived": "Marcar como Recibido",
     "noDebts": "No hay deudas para mostrar. ¡Agregá algunos artículos y calculá los gastos!"
-  }
+  },
+  "language": "es-AR"
 }

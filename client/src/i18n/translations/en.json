@@ -34,6 +34,8 @@
     "shoppingList": "Shopping List",
     "itemName": "Item name",
     "price": "Price",
+    "created": "Created",
+    "viewList": "View List",
     "paidBy": {
       "you": "You",
       "other": "Other"
@@ -49,5 +51,6 @@
     "markAsPaid": "Mark as Paid",
     "markAsReceived": "Mark as Received",
     "noDebts": "No debts to display. Add some items and calculate expenses!"
-  }
+  },
+  "language": "en"
 }
