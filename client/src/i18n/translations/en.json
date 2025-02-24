@@ -1,0 +1,51 @@
+{
+  "auth": {
+    "welcome": "Welcome to SplitCart",
+    "login": "Login",
+    "register": "Register",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "tagline": "Split Expenses, Not Friendships",
+    "description": "Create shopping lists, track expenses, and easily split costs with friends and roommates.",
+    "features": {
+      "realtime": {
+        "title": "Real-time Updates",
+        "description": "See changes instantly as your group adds items and makes purchases"
+      },
+      "smart": {
+        "title": "Smart Calculations",
+        "description": "Automatically calculate who owes what, making settling up simple"
+      }
+    }
+  },
+  "home": {
+    "welcome": "Welcome, {{username}}!",
+    "subtitle": "Manage your shopping lists and expenses",
+    "newList": "New List",
+    "joinList": "Join List"
+  },
+  "list": {
+    "shareCode": "Share code",
+    "share": "Share",
+    "calculateDebts": "Calculate Debts",
+    "shoppingList": "Shopping List",
+    "itemName": "Item name",
+    "price": "Price",
+    "paidBy": {
+      "you": "You",
+      "other": "Other"
+    }
+  },
+  "debts": {
+    "summary": "Debt Summary",
+    "youOwe": "You Owe",
+    "owedToYou": "Owed to You",
+    "settled": "Settled",
+    "to": "to User {{user}}",
+    "from": "from User {{user}}",
+    "markAsPaid": "Mark as Paid",
+    "markAsReceived": "Mark as Received",
+    "noDebts": "No debts to display. Add some items and calculate expenses!"
+  }
+}

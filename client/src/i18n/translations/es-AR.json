@@ -1,0 +1,51 @@
+{
+  "auth": {
+    "welcome": "Bienvenido a SplitCart",
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "username": "Usuario",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "tagline": "Dividí Gastos, No Amistades",
+    "description": "Creá listas de compras, registrá gastos y dividí costos con amigos y compañeros de casa fácilmente.",
+    "features": {
+      "realtime": {
+        "title": "Actualizaciones en Tiempo Real",
+        "description": "Mirá los cambios al instante cuando tu grupo agrega artículos y realiza compras"
+      },
+      "smart": {
+        "title": "Cálculos Inteligentes",
+        "description": "Calculá automáticamente quién debe qué, haciendo los pagos más simples"
+      }
+    }
+  },
+  "home": {
+    "welcome": "¡Bienvenido, {{username}}!",
+    "subtitle": "Administrá tus listas de compras y gastos",
+    "newList": "Nueva Lista",
+    "joinList": "Unirse a Lista"
+  },
+  "list": {
+    "shareCode": "Código para compartir",
+    "share": "Compartir",
+    "calculateDebts": "Calcular Deudas",
+    "shoppingList": "Lista de Compras",
+    "itemName": "Nombre del artículo",
+    "price": "Precio",
+    "paidBy": {
+      "you": "Vos",
+      "other": "Otro"
+    }
+  },
+  "debts": {
+    "summary": "Resumen de Deudas",
+    "youOwe": "Debés",
+    "owedToYou": "Te Deben",
+    "settled": "Saldado",
+    "to": "al Usuario {{user}}",
+    "from": "del Usuario {{user}}",
+    "markAsPaid": "Marcar como Pagado",
+    "markAsReceived": "Marcar como Recibido",
+    "noDebts": "No hay deudas para mostrar. ¡Agregá algunos artículos y calculá los gastos!"
+  }
+}

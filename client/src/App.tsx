@@ -8,6 +8,8 @@ import AuthPage from "@/pages/auth-page";
 import ListPage from "@/pages/list-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { AuthProvider } from "./hooks/use-auth";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import "./i18n/config";
 
 function Router() {
   return (
@@ -25,6 +27,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Router />
+        <LanguageSwitcher />
         <Toaster />
       </AuthProvider>
     </QueryClientProvider>
